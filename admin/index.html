@@ -1,206 +1,65 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b0d14" />
-  <title>NOVA+ TV — Administración</title>
-  <link rel="stylesheet" href="admin.css" />
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA+ TV — Gestor</title><link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark">NOVA<span>+</span></div>
-      <div>
-        <strong>TV</strong>
-        <small>Administración</small>
+<header class="topbar">
+  <div class="brand"><strong>NOVA<span>+</span> TV</strong><small>Gestor de canales</small></div>
+  <div class="actions"><span id="apiStatus" class="status">API sin comprobar</span><button id="btnToken">🔐 Token</button></div>
+</header>
+<nav class="views">
+  <button class="viewbtn active" data-view="channels">Canales</button>
+  <button class="viewbtn" data-view="playlists">Listas</button>
+  <button class="viewbtn" data-view="categories">Categorías</button>
+  <button class="viewbtn" data-view="reports">Reportes <b id="reportBadge"></b></button>
+</nav>
+<main>
+<section id="channels" class="view active">
+  <div class="toolbar">
+    <input id="search" placeholder="Buscar canal, categoría o URL…">
+    <select id="playlistFilter"></select><select id="categoryFilter"></select>
+    <button id="btnNewChannel" class="primary">+ Nuevo canal</button>
+    <label class="filebtn">Importar M3U<input id="m3uFile" type="file" accept=".m3u,.m3u8,text/plain"></label>
+  </div>
+  <div class="stats"><span id="statsText"></span></div>
+  <div class="workspace">
+    <form id="channelForm" class="editor glass">
+      <h2>Datos del canal</h2><input id="channelId" type="hidden">
+      <div class="grid2">
+        <label>Lista<select id="playlistId" required></select></label>
+        <label>Número<input id="number"></label>
       </div>
-    </div>
-
-    <div class="top-actions">
-      <span id="apiStatus" class="status offline">API sin comprobar</span>
-      <button id="btnToken" class="btn ghost">🔐 Token</button>
-    </div>
-  </header>
-
-  <main class="shell">
-    <aside class="sidebar">
-      <button class="nav active" data-view="channels">📺 Canales</button>
-      <button class="nav" data-view="reports">❓ Reportes <span id="reportBadge" class="badge hidden">0</span></button>
-      <button class="nav" data-view="categories">🗂 Categorías</button>
-    </aside>
-
-    <section class="content">
-      <section id="view-channels" class="view active">
-        <div class="section-head">
-          <div>
-            <h1>Canales</h1>
-            <p>Agrega, edita, oculta o elimina canales del catálogo.</p>
-          </div>
-          <button id="btnAddChannel" class="btn primary">+ Agregar canal</button>
-        </div>
-
-        <div class="toolbar">
-          <input id="channelSearch" type="search" placeholder="Buscar canal..." />
-          <select id="categoryFilter">
-            <option value="">Todas las categorías</option>
-          </select>
-          <button id="btnReloadChannels" class="btn ghost">↻ Actualizar</button>
-        </div>
-
-        <div id="channelsList" class="cards"></div>
-      </section>
-
-      <section id="view-reports" class="view">
-        <div class="section-head">
-          <div>
-            <h1>Reportes</h1>
-            <p>Canales reportados como caídos desde la app.</p>
-          </div>
-          <button id="btnReloadReports" class="btn ghost">↻ Actualizar</button>
-        </div>
-        <div id="reportsList" class="cards"></div>
-      </section>
-
-      <section id="view-categories" class="view">
-        <div class="section-head">
-          <div>
-            <h1>Categorías</h1>
-            <p>Estas categorías vienen de tu base D1.</p>
-          </div>
-          <button id="btnReloadCategories" class="btn ghost">↻ Actualizar</button>
-        </div>
-        <div id="categoriesList" class="category-grid"></div>
-        <div class="note">
-          En esta primera versión las categorías se consultan desde la API. En la siguiente fase
-          agregaremos crear, renombrar, ordenar y eliminar categorías desde este mismo panel.
-        </div>
-      </section>
-    </section>
-  </main>
-
-  <dialog id="channelDialog" class="modal">
-    <form id="channelForm" method="dialog">
-      <div class="modal-head">
-        <div>
-          <h2 id="channelDialogTitle">Agregar canal</h2>
-          <p>Los cambios se guardan directamente en D1.</p>
-        </div>
-        <button type="button" class="icon-btn" data-close="channelDialog">✕</button>
-      </div>
-
-      <input type="hidden" id="channelId" />
-
-      <div class="form-grid">
-        <label>
-          <span>Nombre *</span>
-          <input id="name" required placeholder="Ej. Azteca Uno HD" />
-        </label>
-
-        <label>
-          <span>Número</span>
-          <input id="number" placeholder="001" />
-        </label>
-
-        <label class="wide">
-          <span>Logo URL</span>
-          <input id="logoUrl" type="url" placeholder="https://..." />
-        </label>
-
-        <label class="wide">
-          <span>URL principal *</span>
-          <input id="streamUrl" required placeholder="https://...m3u8 o http://..." />
-        </label>
-
-        <label class="wide">
-          <span>URL de respaldo</span>
-          <input id="backupUrl" placeholder="https://...m3u8" />
-        </label>
-
-        <label>
-          <span>Categoría *</span>
-          <select id="categoryId" required></select>
-        </label>
-
-        <label>
-          <span>Orden</span>
-          <input id="sortOrder" type="number" value="0" />
-        </label>
-
-        <label>
-          <span>TVG ID</span>
-          <input id="tvgId" />
-        </label>
-
-        <label>
-          <span>Channel ID</span>
-          <input id="channelExternalId" />
-        </label>
-
-        <label>
-          <span>Proveedor</span>
-          <input id="provider" placeholder="Pluto, Roku, Plex..." />
-        </label>
-
-        <label>
-          <span>EPG ID</span>
-          <input id="epgId" />
-        </label>
-
-        <label class="check">
-          <input id="active" type="checkbox" checked />
-          <span>Canal activo</span>
-        </label>
-
-        <label class="check">
-          <input id="featured" type="checkbox" />
-          <span>Destacado</span>
-        </label>
-      </div>
-
-      <div class="preview-row">
-        <div id="logoPreview" class="logo-preview">LOGO</div>
-        <div>
-          <strong id="previewName">Vista previa</strong>
-          <small id="previewUrl">URL del stream</small>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" id="btnTestStream" class="btn ghost">▶ Probar enlace</button>
-        <div class="spacer"></div>
-        <button type="button" class="btn ghost" data-close="channelDialog">Cancelar</button>
-        <button type="submit" class="btn primary">Guardar</button>
-      </div>
+      <label>Nombre<input id="name" required></label>
+      <div class="grid2"><label>Categoría<select id="categoryId" required></select></label><label>ID / EPG ID<input id="epgId"></label></div>
+      <label>Logo<input id="logoUrl"></label>
+      <label>Enlace M3U8 / Stream<textarea id="streamUrl" rows="3" required></textarea></label>
+      <label>Respaldo<textarea id="backupUrl" rows="2"></textarea></label>
+      <div class="grid2"><label>TVG ID<input id="tvgId"></label><label>Proveedor<input id="provider"></label></div>
+      <div class="grid2"><label>Orden<input id="sortOrder" type="number" value="0"></label><label class="checks"><input id="active" type="checkbox" checked> Canal activo</label></div>
+      <div class="formActions"><button class="primary" type="submit">Guardar canal</button><button id="btnDeleteChannel" type="button" class="danger">Eliminar</button><button id="btnClear" type="button">Limpiar</button></div>
     </form>
-  </dialog>
+    <div class="listpanel glass"><h2>Canales</h2><div id="channelList" class="channelList"></div></div>
+  </div>
+</section>
 
-  <dialog id="tokenDialog" class="modal small">
-    <form id="tokenForm" method="dialog">
-      <div class="modal-head">
-        <div>
-          <h2>Token administrativo</h2>
-          <p>Se guarda solo durante esta sesión del navegador.</p>
-        </div>
-        <button type="button" class="icon-btn" data-close="tokenDialog">✕</button>
-      </div>
+<section id="playlists" class="view">
+  <div class="sectionHead"><div><h1>Listas de reproducción</h1><p>Crea, renombra, ordena o elimina listas.</p></div><button id="btnNewPlaylist" class="primary">+ Nueva lista</button></div>
+  <div id="playlistCards" class="cards"></div>
+</section>
+<section id="categories" class="view">
+  <div class="sectionHead"><div><h1>Categorías</h1><p>Crea y renombra categorías usadas por los canales.</p></div><button id="btnNewCategory" class="primary">+ Nueva categoría</button></div>
+  <div id="categoryCards" class="cards"></div>
+</section>
+<section id="reports" class="view">
+  <div class="sectionHead"><div><h1>Reportes</h1><p>Reportes enviados desde móvil y Smart TV.</p></div><button id="btnReloadReports">Actualizar</button></div>
+  <div id="reportCards" class="cards"></div>
+</section>
+</main>
 
-      <label>
-        <span>ADMIN_TOKEN</span>
-        <input id="adminToken" type="password" autocomplete="off" required placeholder="Pega aquí tu token secreto" />
-      </label>
-
-      <div class="modal-actions">
-        <button type="button" id="btnForgetToken" class="btn danger ghost-danger">Olvidar token</button>
-        <div class="spacer"></div>
-        <button type="button" class="btn ghost" data-close="tokenDialog">Cancelar</button>
-        <button type="submit" class="btn primary">Usar token</button>
-      </div>
-    </form>
-  </dialog>
-
-  <div id="toast" class="toast"></div>
-
-  <script src="admin.js"></script>
-</body>
-</html>
+<dialog id="simpleDialog"><form id="simpleForm" method="dialog"><h2 id="simpleTitle"></h2><input id="simpleId" type="hidden"><input id="simpleType" type="hidden"><label>Nombre<input id="simpleName" required></label><label>Slug<input id="simpleSlug"></label><label>Orden<input id="simpleOrder" type="number" value="0"></label><label class="checks"><input id="simpleActive" type="checkbox" checked> Activo</label><div class="formActions"><button value="cancel">Cancelar</button><button class="primary" value="default" id="simpleSave">Guardar</button></div></form></dialog>
+<dialog id="tokenDialog"><form id="tokenForm" method="dialog"><h2>Token administrativo</h2><label>ADMIN_TOKEN<input id="token" type="password" required></label><div class="formActions"><button value="cancel">Cancelar</button><button class="primary" value="default">Usar token</button></div></form></dialog>
+<div id="toast"></div>
+<script src="admin.js"></script>
+</body></html>
